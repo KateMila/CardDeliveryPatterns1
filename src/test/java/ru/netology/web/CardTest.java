@@ -30,15 +30,37 @@ public class CardTest {
         $("[data-test-id=phone] input").setValue(user.getPhone());
         $("[data-test-id=agreement]").click();
         $(".button").click();
-        $(withText("Успешно!")).shouldBe(Condition.visible, Duration.ofSeconds(15000));
+        $(withText("Успешно!")).shouldBe(Condition.visible, Duration.ofSeconds(15));
         $("[data-test-id=success-notification]")
                 .shouldHave(exactText("Успешно! Встреча успешно запланирована на " + generateDate(8)));
         $(".calendar-input input").doubleClick().sendKeys(Keys.BACK_SPACE);
         $(".calendar-input input").setValue(generateDate(9));
         $(".button").click();
-        $(withText("Необходимо подтверждение")).shouldBe(Condition.visible, Duration.ofSeconds(15000));
+        $(withText("Необходимо подтверждение")).shouldBe(Condition.visible, Duration.ofSeconds(15));
         $(".button__text").click();
-        $("[data-test-id=success-notification]").shouldBe(Condition.visible, Duration.ofSeconds(15000)).shouldHave(exactText("Успешно! Встреча успешно запланирована на " + generateDate(9)));
+        $("[data-test-id=success-notification]").shouldBe(Condition.visible, Duration.ofSeconds(15)).shouldHave(exactText("Успешно! Встреча успешно запланирована на " + generateDate(9)));
     }
-
+    @Test
+    void shouldSendFormWithInvalidSurname() {
+        UserInfo user = generateUser();
+        $("[data-test-id=city] input").setValue(user.getCity());
+        $(".calendar-input input").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $(".calendar-input input").setValue(generateDate(8));
+        $("[data-test-id=name] input").setValue("Pavlova Лидия");
+        $("[data-test-id=phone] input").setValue(user.getPhone());
+        $("[data-test-id=agreement]").click();
+        $(".button").click();
+        $("[data-test-id=name] .input__sub").shouldHave(exactText("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы."));
+    }
+    @Test
+    void shouldSendFormWithInvalidCity() {
+        $("[data-test-id=city] input").setValue("St. Petersburg");
+        $(".calendar-input input").doubleClick().sendKeys(Keys.BACK_SPACE);
+        $(".calendar-input input").setValue(generateDate(8));
+        $("[data-test-id=name] input").setValue(generateUser().getName());
+        $("[data-test-id=phone] input").setValue(generateUser().getPhone());
+        $("[data-test-id=agreement]").click();
+        $(".button").click();
+        $("[data-test-id=city] .input__sub").shouldHave(exactText("Доставка в выбранный город недоступна"));
+    }
 }
